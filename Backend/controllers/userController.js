@@ -1,4 +1,5 @@
 import User from "../models/Usermodel.js";
+
 import bcrypt from "bcryptjs";
 import generateTokenANdSetTOken from "../utils/helpers/generateTokenSetCookie.js";
 async function signUpuser(req, res) {
@@ -7,7 +8,7 @@ async function signUpuser(req, res) {
     const user = await User.findOne({ $or: [{ email }, { username }] });
 
     if (user) {
-      return res.status(400).json({ message: "user already exists " });
+      return res.status(400).json({ error: "user already exists " });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -31,10 +32,10 @@ async function signUpuser(req, res) {
         email: newUser.email,
       });
     } else {
-      res.status(400).json({ message: "invallid user data" });
+      res.status(400).json({ error: "invallid user data" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
     console.log("error in singup user");
   }
 }
@@ -47,7 +48,7 @@ async function loginUser(req, res) {
 
 
     if (!user || !isPasswordcorrect) {
-      return res.status(400).json({ message: "Invalid username or password " });
+      return res.status(400).json({ error: "Invalid username or password " });
     }
 
     generateTokenANdSetTOken(user._id,res);
@@ -55,7 +56,7 @@ async function loginUser(req, res) {
     res.status(200).json({user:user})
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
     console.log("error in login user");
   }
 }
@@ -63,9 +64,9 @@ async function loginUser(req, res) {
 async function logoutUser (req,res){
  try {
     res.cookie("jwt","",{maxAge:1});
-    res.status(200).json({message:"user logged out successfull"})
+    res.status(200).json({error:"user logged out successfull"})
  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
     console.log("error in logout user");
  }
 }
@@ -78,9 +79,9 @@ async function followandunfollowuser (req,res){
         
         
         console.log(id, currentUser._id)
-        if (id ==currentUser._id)return res.status(400 ).json({message:"you cannot follow or unfollow your self "})
+        if (id ==currentUser._id)return res.status(400 ).json({error:"you cannot follow or unfollow your self "})
         
-        if (!usertoModify || !currentUser) return res.status(500).json({message:"user not found "})
+        if (!usertoModify || !currentUser) return res.status(500).json({error:"user not found "})
 
         const isFolloiwng = currentUser.following.includes(id);
 
@@ -91,7 +92,7 @@ async function followandunfollowuser (req,res){
             
             //modify the modified user followers 
             await User.findByIdAndUpdate(id,{$pull:{followers:req.user._id}})
-            res.status(200).json({message:"user Unfollowed "})
+            res.status(200).json({error:"user Unfollowed "})
         }else{
             //follow the user with id
             //modify the following of current user 
@@ -99,15 +100,65 @@ async function followandunfollowuser (req,res){
             
             // modify the  followers of modified user 
             await User.findByIdAndUpdate(id,{$push:{followers:req.user._id}})
-            res.status(200).json({message:"user followed "})
+            res.status(200).json({error:"user followed "})
             
         }
 
 
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ error: error.message });
     console.log("error in follow & unfollow  user");
     }
 }
-export { signUpuser, loginUser ,logoutUser,followandunfollowuser};
+
+async function updateUser (req,res){
+const {name, email, username, password, profilePic,bio}=req.body;
+const userId= req.user._id
+try {
+  let user = await User.findById(userId)
+  if (!user) return res.status (400).json({error:'User not found '})
+
+  if(req.params.id !== userId.toString()){
+    res.status(400).json({error:"cannot update others profile "})
+  }
+
+  if (password){
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password,salt)
+    user.password=hashedPassword
+  }
+
+  user.name=name || user.name
+  user.email=email || user.email
+  user.username=username || user.username
+  user.profilePic=profilePic || user.profilePic
+  user.bio=bio || user.bio
+
+  await user.save();
+
+  res.json({error:'profile updated succesfullly' ,user})
+
+} catch (error) {
+  res.status(500).json({ error: error.message });
+    console.log("error in Update user");
+}
+}
+
+async function getUserProfile (req,res){
+try {
+  const {username}=req.params
+  const user = await User.findOne({username}).select("-password").select("-updatedAt")
+  console.log(user)
+
+  if (!user){
+    return res.status(404).json ({error:"user not found "})
+  }
+
+  res.status(200).json(user)
+} catch (error) {
+  res.status(500).json({ error: error.message });
+    console.log("error in getUserProfile ");
+}
+}
+export { signUpuser, loginUser ,logoutUser,followandunfollowuser, updateUser,getUserProfile};

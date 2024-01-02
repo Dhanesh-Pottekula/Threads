@@ -10,9 +10,9 @@ const protectmiddleware = async (req,res,next)=>{
         const decoded =  jwt.verify(token,process.env.JWT_SECRET)
         
         const userid=decoded.userId
-        console.log(userid)
+
         const user = await User.findById(userid).select("-password");
-        console.log(user)
+
         req.user=user
 
         next();

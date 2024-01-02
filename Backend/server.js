@@ -3,6 +3,7 @@ import express from 'express'
 import { ConnectDB } from './DB/connectDb.js';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
+import postRoutes from './routes/PostRoutes.js';
 
 
 dotenv.config()
@@ -13,8 +14,9 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser());
 
-
 app.use('/api/users',userRoutes)
+app.use('/api/posts',postRoutes)
+
 
 app.listen (port,()=>{
     console.log (`server is listening on the port ${port}`)
