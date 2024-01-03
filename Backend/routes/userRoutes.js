@@ -10,5 +10,5 @@ router
 .post('/login',loginUser)
 .post ("/logout",logoutUser)
 .post('/follow/:id',protectmiddleware,followandunfollowuser)
-.post('/update/:id',protectmiddleware,updateUser)
+.put('/update/:id',protectmiddleware,updateUser)
 export default router;
