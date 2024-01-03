@@ -64,7 +64,7 @@ async function loginUser(req, res) {
 async function logoutUser (req,res){
  try {
     res.cookie("jwt","",{maxAge:1});
-    res.status(200).json({error:"user logged out successfull"})
+    res.status(200).json({message:"user logged out successfull"})
  } catch (error) {
     res.status(500).json({ error: error.message });
     console.log("error in logout user");
@@ -92,7 +92,7 @@ async function followandunfollowuser (req,res){
             
             //modify the modified user followers 
             await User.findByIdAndUpdate(id,{$pull:{followers:req.user._id}})
-            res.status(200).json({error:"user Unfollowed "})
+            res.status(200).json({message:"user Unfollowed "})
         }else{
             //follow the user with id
             //modify the following of current user 
@@ -100,7 +100,7 @@ async function followandunfollowuser (req,res){
             
             // modify the  followers of modified user 
             await User.findByIdAndUpdate(id,{$push:{followers:req.user._id}})
-            res.status(200).json({error:"user followed "})
+            res.status(200).json({message:"user followed "})
             
         }
 
