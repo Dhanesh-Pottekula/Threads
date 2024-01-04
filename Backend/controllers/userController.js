@@ -1,9 +1,11 @@
 import User from "../models/Usermodel.js";
+import {Post} from "../models/postModel.js";
 
 import bcrypt from "bcryptjs";
 import generateTokenANdSetTOken from "../utils/helpers/generateTokenSetCookie.js";
 import { v2 as cloudinary } from "cloudinary";
 import mongoose from "mongoose";
+
 
 async function signUpuser(req, res) {
   try {
@@ -164,6 +166,18 @@ async function updateUser(req, res) {
     user.bio = bio || user.bio;
 
     user = await user.save();
+// Find all posts that this user replied and update username and userProfilePic fields
+await Post.updateMany(
+  { "replies.userId": userId },
+  {
+    $set: {
+      "replies.$[reply].username": user.username,
+      "replies.$[reply].userProfilePic": user.profilePic,
+    },
+  },
+  { arrayFilters: [{ "reply.userId": userId }] }
+);
+
     user.password=null
     res.status(200).json( user );
   } catch (error) {
