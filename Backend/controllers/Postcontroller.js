@@ -25,10 +25,10 @@ const createpost = async (req, res) => {
 			return res.status(400).json({ error: `Text must be less than ${maxLength} characters` });
 		}
 
-		// if (img) {
-		// 	const uploadedResponse = await cloudinary.uploader.upload(img);
-		// 	img = uploadedResponse.secure_url;
-		// }
+		if (img) {
+			const uploadedResponse = await cloudinary.uploader.upload(img);
+			img = uploadedResponse.secure_url;
+		}
 
 		const newPost = new Post({ postedBy, text, img });
 		await newPost.save();
@@ -143,8 +143,9 @@ const getfeedposts=async (req,res)=>{
         }
         const following= user.following;
         const feedPosts= await Post.find({postedBy:{$in:following}}).sort({createdAt:-1});
-        return res.status(200).json({feedposts:feedPosts})
+        return res.status(200).json(feedPosts)
     } catch (error) {
+        res.status(500).json({message:'error in getting feed post '})
         
     }
 }

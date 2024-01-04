@@ -5,7 +5,7 @@ import { protectmiddleware } from "../middleware/protectRoute.js";
 const router = express.Router();
 
 router
-.get('/profile/:username',getUserProfile)
+.get('/profile/:query',getUserProfile)
 .post('/signup',signUpuser)
 .post('/login',loginUser)
 .post ("/logout",logoutUser)

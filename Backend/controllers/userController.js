@@ -3,6 +3,7 @@ import User from "../models/Usermodel.js";
 import bcrypt from "bcryptjs";
 import generateTokenANdSetTOken from "../utils/helpers/generateTokenSetCookie.js";
 import { v2 as cloudinary } from "cloudinary";
+import mongoose from "mongoose";
 
 async function signUpuser(req, res) {
   try {
@@ -172,11 +173,16 @@ async function updateUser(req, res) {
 }
 
 async function getUserProfile(req, res) {
+  const {query}= req.params
   try {
-    const { username } = req.params;
-    const user = await User.findOne({ username })
-      .select("-password")
-      .select("-updatedAt");
+    let user;
+    if (mongoose.Types.ObjectId.isValid(query)){
+      user= await User.findOne({_id:query}).select("-password").select('-updatedAt'); 
+    }else{
+       user = await User.findOne({ username:query })
+        .select("-password")
+        .select("-updatedAt");
+    }
     console.log(user);
 
     if (!user) {
