@@ -1,6 +1,7 @@
 import express from "express";
 import {signUpuser,loginUser,logoutUser,followandunfollowuser,updateUser,getUserProfile} from "../controllers/userController.js";
-import { protectmiddleware } from "../middleware/protectRoute.js";
+import { protectRoute } from "../middleware/protectRoute.js";
+
 
 const router = express.Router();
 
@@ -9,6 +10,6 @@ router
 .post('/signup',signUpuser)
 .post('/login',loginUser)
 .post ("/logout",logoutUser)
-.post('/follow/:id',protectmiddleware,followandunfollowuser)
-.put('/update/:id',protectmiddleware,updateUser)
+.post('/follow/:id',protectRoute,followandunfollowuser)
+.put('/update/:id',protectRoute,updateUser)
 export default router;

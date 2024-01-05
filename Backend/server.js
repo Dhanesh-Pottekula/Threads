@@ -4,10 +4,11 @@ import { ConnectDB } from './DB/connectDb.js';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/userRoutes.js';
 import postRoutes from './routes/PostRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 import  {v2 as cloudinary} from 'cloudinary';
-
+import {app, server} from './socket/socket.js'
 dotenv.config()
-const  app = express();
+
 const port = 8080
 
 cloudinary.config({ 
@@ -26,7 +27,10 @@ app.use('/api/users',userRoutes)
 app.use('/api/posts',postRoutes)
 
 
-app.listen (port,()=>{
+app.use('/api/messages',messageRoutes)
+
+
+server.listen (port,()=>{
     console.log (`server is listening on the port ${port}`)
 });
 

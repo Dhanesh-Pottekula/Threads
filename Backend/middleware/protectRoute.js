@@ -1,6 +1,6 @@
 import User from "../models/Usermodel.js"
 import jwt, { decode }  from "jsonwebtoken"
-const protectmiddleware = async (req,res,next)=>{
+const protectRoute = async (req,res,next)=>{
     try {
         
         const token = req.cookies.jwt;
@@ -23,4 +23,4 @@ const protectmiddleware = async (req,res,next)=>{
     }
 }
 
-export {protectmiddleware}
+export {protectRoute}
